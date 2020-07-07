@@ -81,6 +81,7 @@
 #endif
 
 XPT2046 touch;
+extern int8_t encoderDiff;
 
 void XPT2046::init() {
   SET_INPUT(TOUCH_MISO_PIN);

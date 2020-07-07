@@ -60,8 +60,16 @@ void GcodeSuite::M303() {
     }
   #endif
 
-  #define SI TERN(PIDTEMPBED, H_BED, H_E0)
-  #define EI TERN(PIDTEMP, HOTENDS - 1, H_BED)
+  #if ENABLED(PIDTEMPBED)
+    #define SI H_BED
+  #else
+    #define SI H_E0
+  #endif
+  #if ENABLED(PIDTEMP)
+    #define EI HOTENDS - 1
+  #else
+    #define EI H_BED
+  #endif
   const heater_ind_t e = (heater_ind_t)parser.intval('E');
   if (!WITHIN(e, SI, EI)) {
     SERIAL_ECHOLNPGM(STR_PID_BAD_EXTRUDER_NUM);
@@ -71,7 +79,7 @@ void GcodeSuite::M303() {
 
   const int c = parser.intval('C', 5);
   const bool u = parser.boolval('U');
-  const int16_t temp = parser.celsiusval('S', e < 0 ? PREHEAT_1_TEMP_BED : PREHEAT_1_TEMP_HOTEND);
+  const int16_t temp = parser.celsiusval('S', e < 0 ? 70 : 150);
 
   #if DISABLED(BUSY_WHILE_HEATING)
     KEEPALIVE_STATE(NOT_BUSY);
